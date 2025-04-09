@@ -60,8 +60,8 @@ const Dashboard = () => {
   return (
     <div className="max-w-5xl mx-auto p-4">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold">Welcome, {user.name}</h2>
-        <p className="text-gray-600">{user.email}</p>
+        <h2 className="text-2xl font-bold">Welcome, {user?.name}</h2>
+        <p className="text-gray-600">{user?.email}</p>
         <Link
           to="/create-blog"
           className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded"
