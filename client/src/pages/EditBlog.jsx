@@ -1,18 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ImagePlus } from "lucide-react";
 
-const CreateBlog = () => {
-  const [form, setForm] = useState({
-    title: "",
-    content: "",
-    tags: "",
-  });
+const EditBlog = () => {
+  const { id } = useParams();
+  const [form, setForm] = useState({ title: "", content: "", tags: "" });
   const [image, setImage] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_SERVER_URI}blogs/${id}`,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const { title, content, tags } = res.data;
+        setForm({ title, content, tags: tags.join(", ") });
+      } catch (err) {
+        console.error("Failed to load blog", err);
+      }
+    };
+    fetchBlog();
+  }, [id]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,28 +55,27 @@ const CreateBlog = () => {
     const blogData = new FormData();
     blogData.append("title", form.title);
     blogData.append("content", form.content);
-    blogData.append("tags", form.tags);
+    blogData.append(
+      "tags",
+      JSON.stringify(form.tags.split(",").map((tag) => tag.trim()))
+    );
     if (image) blogData.append("image", image);
 
     try {
-      
-      const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URI}blogs`,
+      await axios.put(
+        `${import.meta.env.VITE_SERVER_URI}blogs/${id}`,
         blogData,
         {
           withCredentials: true,
           headers: {
-            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-
-      if (response.data) {
-        navigate("/dashboard");
-      }
+      navigate("/dashboard");
     } catch (err) {
-      console.error("Blog creation error:", err);
-      setError(err.response?.data?.msg || "Failed to create blog");
+      console.error("Failed to update blog", err);
+      setError(err.response?.data?.msg || "Failed to update blog");
     } finally {
       setLoading(false);
     }
@@ -66,11 +84,11 @@ const CreateBlog = () => {
   return (
     <div className="max-w-3xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
       <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
-        Create New Blog
+        Edit Blog
       </h2>
 
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-      {loading && <p className="text-blue-500 text-sm mb-4">Submitting...</p>}
+      {loading && <p className="text-blue-500 text-sm mb-4">Updating...</p>}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -117,7 +135,7 @@ const CreateBlog = () => {
         <div>
           <label className="flex items-center space-x-2 mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
             <ImagePlus className="w-5 h-5 text-blue-500" />
-            <span>Upload Image</span>
+            <span>Upload New Image</span>
           </label>
           <input
             type="file"
@@ -142,11 +160,11 @@ const CreateBlog = () => {
           disabled={loading}
           className="bg-green-700 hover:bg-green-800 disabled:opacity-50 text-white font-medium py-2 px-6 rounded-md transition-colors"
         >
-          {loading ? "Publishing..." : "Publish Blog"}
+          {loading ? "Updating..." : "Update Blog"}
         </button>
       </form>
     </div>
   );
 };
 
-export default CreateBlog;
+export default EditBlog;

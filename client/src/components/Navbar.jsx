@@ -45,7 +45,7 @@ const Navbar = () => {
           to="/"
           className="text-2xl font-bold text-green-600 dark:text-green-400"
         >
-          DevConnect
+          <span className="text-white">Dev</span>Connect
         </Link>
 
         {/* Right Section */}

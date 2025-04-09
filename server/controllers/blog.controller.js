@@ -128,14 +128,41 @@ exports.updateBlog = async (req, res) => {
       return res.status(403).json({ msg: "Unauthorized" });
     }
 
-    blog.title = req.body.title || blog.title;
-    blog.content = req.body.content || blog.content;
-    blog.tags = req.body.tags || blog.tags;
+    // Handle image upload if present
+    if (req.file) {
+      blog.image = req.file.path;
+    }
 
-    await blog.save();
-    res.json(blog);
+    // Parse tags if they're sent as a string
+    let tags = [];
+    if (typeof req.body.tags === "string") {
+      try {
+        tags = JSON.parse(req.body.tags);
+      } catch (e) {
+        tags = req.body.tags.split(",").map((tag) => tag.trim());
+      }
+    }
+
+    // Update blog fields
+    const updates = {
+      title: req.body.title,
+      content: req.body.content,
+      tags: tags,
+      ...(req.file && { image: req.file.path }),
+    };
+
+    // Update only provided fields
+    Object.keys(updates).forEach((key) => {
+      if (updates[key] !== undefined) {
+        blog[key] = updates[key];
+      }
+    });
+
+    const updatedBlog = await blog.save();
+    res.json(updatedBlog);
   } catch (err) {
-    res.status(500).send("Server Error");
+    console.error("Blog update error:", err);
+    res.status(500).json({ msg: "Error updating blog" });
   }
 };
 

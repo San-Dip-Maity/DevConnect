@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import CreateBlog from "./pages/CreateBlog";
+import EditBlog from "./pages/EditBlog";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/blogs/:id" element={<BlogDetails />} />
             <Route path="/create-blog" element={<CreateBlog />} />
+            <Route path="/blogs/edit/:id" element={<EditBlog />} />
           </Routes>
         </Router>
       </AuthProvider>
