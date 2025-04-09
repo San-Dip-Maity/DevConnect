@@ -19,7 +19,6 @@ const Dashboard = () => {
             },
           }
         );
-        console.log(res.data);
         if (res.data.success) {
           setUser(res.data.data);
         }
@@ -34,6 +33,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchUserBlogs = async () => {
+      if (!user?._id) return;
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_SERVER_URI}blogs/user/${user._id}`,
@@ -44,12 +44,9 @@ const Dashboard = () => {
             },
           }
         );
-        console.log(response.data.blogs);
         setBlogs(response.data.blogs);
-        return response.data;
       } catch (err) {
         console.error("Error fetching user blogs:", err);
-        throw err;
       }
     };
 
@@ -57,38 +54,56 @@ const Dashboard = () => {
   }, [user]);
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold">Welcome, {user?.name}</h2>
-        <p className="text-gray-600">{user?.email}</p>
+    <div className="max-w-6xl mx-auto px-4 py-10">
+      {/* User Info Section */}
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow mb-10">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-white">
+          Welcome, {user?.name}
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400">{user?.email}</p>
         <Link
           to="/create-blog"
-          className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded"
+          className="inline-block mt-4 bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded transition"
         >
           + Create Blog
         </Link>
       </div>
 
+      {/* Blog List Section */}
       <div>
-        <h3 className="text-xl font-semibold mb-2">Your Blogs</h3>
+        <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
+          Your Blogs
+        </h3>
+
         {blogs.length === 0 ? (
-          <p className="text-gray-500">No blogs yet.</p>
+          <p className="text-gray-500 dark:text-gray-400">No blogs yet.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {blogs.map((blog) => (
-              <div key={blog._id} className="border rounded p-4">
-                <h4 className="font-bold text-lg">{blog.title}</h4>
-                <div className="flex gap-3 mt-2">
-                  <Link to={`/blogs/${blog._id}`} className="text-blue-600">
+              <div
+                key={blog._id}
+                className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow hover:shadow-lg transition"
+              >
+                <h4 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                  {blog.title}
+                </h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  {new Date(blog.createdAt).toLocaleDateString()}
+                </p>
+                <div className="flex gap-4">
+                  <Link
+                    to={`/blogs/${blog._id}`}
+                    className="text-blue-600 hover:underline"
+                  >
                     View
                   </Link>
                   <Link
                     to={`/blogs/edit/${blog._id}`}
-                    className="text-yellow-600"
+                    className="text-yellow-500 hover:underline"
                   >
                     Edit
                   </Link>
-                  {/* You can add delete handler here */}
+                  {/* Optionally: Add delete button here */}
                 </div>
               </div>
             ))}
