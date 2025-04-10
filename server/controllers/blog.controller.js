@@ -119,6 +119,19 @@ exports.commentOnBlog = async (req, res) => {
   }
 };
 
+exports.getBlogComments = async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id).populate(
+      "comments.user",
+      "name avatar"
+    );
+    if (!blog) return res.status(404).json({ msg: "Blog not found" });
+    res.json(blog.comments);
+  } catch (err) {
+    res.status(500).send("Server Error");
+  }
+};
+
 exports.updateBlog = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);

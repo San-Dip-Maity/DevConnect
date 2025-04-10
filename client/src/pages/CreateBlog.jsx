@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { ImagePlus } from "lucide-react";
+import {
+  ImagePlus,
+  LoaderCircle,
+  FileText,
+  Tags,
+  Heading1,
+  PencilLine,
+} from "lucide-react";
 
 const CreateBlog = () => {
-  const [form, setForm] = useState({
-    title: "",
-    content: "",
-    tags: "",
-  });
+  const [form, setForm] = useState({ title: "", content: "", tags: "" });
   const [image, setImage] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,7 +43,6 @@ const CreateBlog = () => {
     if (image) blogData.append("image", image);
 
     try {
-      
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_URI}blogs`,
         blogData,
@@ -51,7 +53,6 @@ const CreateBlog = () => {
           },
         }
       );
-
       if (response.data) {
         navigate("/dashboard");
       }
@@ -64,17 +65,27 @@ const CreateBlog = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md">
-      <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
-        Create New Blog
-      </h2>
+    <div className="max-w-3xl mx-auto mt-10 p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg space-y-6">
+      <div className="flex items-center gap-3">
+        <PencilLine className="w-8 h-8 text-green-600" />
+        <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white">
+          New Blog Post
+        </h2>
+      </div>
 
-      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-      {loading && <p className="text-blue-500 text-sm mb-4">Submitting...</p>}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {loading && (
+        <div className="flex items-center gap-2 text-blue-600 text-sm">
+          <LoaderCircle className="animate-spin" />
+          Submitting...
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Title */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Heading1 className="w-5 h-5" />
             Blog Title
           </label>
           <input
@@ -83,12 +94,14 @@ const CreateBlog = () => {
             value={form.title}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600"
           />
         </div>
 
-        <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+        {/* Content */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <FileText className="w-5 h-5" />
             Blog Content
           </label>
           <textarea
@@ -97,12 +110,14 @@ const CreateBlog = () => {
             onChange={handleChange}
             required
             rows={10}
-            className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600"
           ></textarea>
         </div>
 
-        <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+        {/* Tags */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Tags className="w-5 h-5" />
             Tags (comma-separated)
           </label>
           <input
@@ -110,37 +125,38 @@ const CreateBlog = () => {
             name="tags"
             value={form.tags}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-600"
           />
         </div>
 
-        <div>
-          <label className="flex items-center space-x-2 mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-            <ImagePlus className="w-5 h-5 text-blue-500" />
-            <span>Upload Image</span>
+        {/* Image Upload */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <ImagePlus className="w-5 h-5 text-green-500" />
+            Upload Image
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="w-full cursor-pointer rounded-xl text-sm bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-3 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full cursor-pointer rounded-lg text-sm bg-gray-100 dark:bg-gray-800 dark:text-white p-3 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-green-600"
           />
-
           {image && (
-            <div className="mt-4">
+            <div className="mt-4 transition-all duration-300">
               <img
                 src={URL.createObjectURL(image)}
                 alt="Preview"
-                className="w-full max-h-64 object-contain rounded-xl border border-gray-300 dark:border-gray-600 shadow"
+                className="w-full max-h-64 object-contain rounded-lg border border-gray-300 dark:border-gray-600 shadow-md"
               />
             </div>
           )}
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="bg-green-700 hover:bg-green-800 disabled:opacity-50 text-white font-medium py-2 px-6 rounded-md transition-colors"
+          className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-semibold py-3 px-6 rounded-lg transition-transform hover:scale-[1.02] shadow"
         >
           {loading ? "Publishing..." : "Publish Blog"}
         </button>

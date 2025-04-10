@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Users } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Users,
+  User,
+  FileText,
+  LoaderCircle,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const Home = () => {
@@ -31,51 +38,46 @@ const Home = () => {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
       {/* Hero Section */}
       <div className="text-center py-12">
-        <h1 className="text-4xl font-extrabold mb-3 text-green-400">
+        <h1 className="text-4xl font-extrabold mb-3 text-green-400 tracking-tight">
           Welcome to DevConnect
         </h1>
         <p className="text-gray-300 text-lg mb-6 max-w-xl mx-auto">
-          A hub for developers to connect, share projects and write blogs
+          A hub for developers to connect, share projects, and write blogs
         </p>
-        {!isAuthenticated ? (
-          <Link
-          to="/register"
-          className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full shadow-lg transition"
+        <Link
+          to={isAuthenticated ? "/dashboard" : "/register"}
+          className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full shadow-lg transition transform hover:scale-105"
         >
-          Join Now
+          {isAuthenticated ? "Go to Dashboard" : "Join Now"}
         </Link>
-        ) : (
-          <Link
-          to="/dashboard"
-          className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full shadow-lg transition"
-        >
-          Dashboard
-        </Link>
-        )}
       </div>
 
       {/* Blogs Section */}
       <section className="mt-10">
         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-          <Users className="text-green-400" /> Recent Blogs
+          <Users className="text-green-400" />
+          Recent Blogs
         </h2>
 
         {loading ? (
-          <div className="text-center py-8 text-green-300">Loading...</div>
+          <div className="flex items-center justify-center gap-2 text-green-300 py-12">
+            <LoaderCircle className="w-5 h-5 animate-spin" />
+            <span>Loading blogs...</span>
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {blogs.map((blog) => (
                 <div
                   key={blog._id}
-                  className="bg-gray-800 rounded-xl shadow-lg p-4 hover:shadow-green-500/40 transition"
+                  className="bg-gray-800 rounded-xl shadow-md p-4 hover:shadow-green-500/40 transition duration-300 hover:scale-[1.01]"
                 >
                   {blog.image && (
                     <img
@@ -84,27 +86,34 @@ const Home = () => {
                       className="w-full h-48 object-cover rounded-lg mb-4"
                     />
                   )}
-                  <h3 className="text-lg font-bold mb-2 text-green-300">
+
+                  <h3 className="text-lg font-bold mb-2 text-green-300 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-green-400" />
                     {blog.title}
                   </h3>
-                  <div className="flex items-center gap-2 mb-2">
-                    {blog.user?.avatar && (
+
+                  <div className="flex items-center gap-2 mb-3">
+                    {blog.user?.avatar ? (
                       <img
                         src={blog.user.avatar}
                         alt={blog.user.name}
-                        className="w-6 h-6 rounded-full"
+                        className="w-6 h-6 rounded-full border border-green-500"
                       />
+                    ) : (
+                      <User className="w-5 h-5 text-gray-400" />
                     )}
                     <p className="text-sm text-gray-400">
-                      By {blog.user?.name}
+                      By {blog.user?.name || "Anonymous"}
                     </p>
                   </div>
-                  <p className="text-gray-300 line-clamp-3">
+
+                  <p className="text-gray-300 line-clamp-3 text-sm mb-3">
                     {blog.content.replace(/<[^>]+>/g, "")}
                   </p>
+
                   <Link
                     to={`/blogs/${blog._id}`}
-                    className="text-green-400 mt-3 inline-block hover:underline"
+                    className="text-green-400 text-sm hover:underline"
                   >
                     Read More →
                   </Link>
@@ -112,8 +121,8 @@ const Home = () => {
               ))}
             </div>
 
-            {/* Pagination Controls */}
-            <div className="flex justify-center items-center gap-2 mt-10">
+            {/* Pagination */}
+            <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
@@ -133,7 +142,7 @@ const Home = () => {
                   onClick={() => handlePageChange(index + 1)}
                   className={`px-4 py-2 rounded-full text-sm transition ${
                     currentPage === index + 1
-                      ? "bg-green-500 text-white"
+                      ? "bg-green-500 text-white font-bold"
                       : "bg-gray-700 text-gray-300 hover:bg-green-600 hover:text-white"
                   }`}
                 >

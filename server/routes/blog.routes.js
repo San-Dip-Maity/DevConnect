@@ -11,6 +11,7 @@ const {
   likeBlog,
   commentOnBlog,
   getBlogsByUserId,
+  getBlogComments,
 } = require("../controllers/blog.controller");
 
 router.get("/user/:userId", getBlogsByUserId);
@@ -21,5 +22,6 @@ router.put("/:id", auth, blog.single("image"), updateBlog);
 router.delete("/:id", auth, deleteBlog);
 router.put("/:id/like", auth, likeBlog);
 router.post("/:id/comment", auth, commentOnBlog);
+router.get("/:id/comment", auth, getBlogComments);
 
 module.exports = router;
