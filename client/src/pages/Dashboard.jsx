@@ -27,6 +27,7 @@ const Dashboard = () => {
             headers: {
               "Content-Type": "application/json",
             },
+
           }
         );
         if (res.data.success) {

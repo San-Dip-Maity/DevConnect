@@ -12,6 +12,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+<<<<<<< HEAD
 app.use(
   cors({
     origin: process.env.CLIENT_URI,
@@ -20,6 +21,14 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+=======
+app.use(cors({
+  origin: "*",
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+>>>>>>> development
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
